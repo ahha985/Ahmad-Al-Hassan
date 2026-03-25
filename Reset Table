@@ -1,0 +1,10 @@
+Sub Reset_Rename()
+    Dim Ansr As VbMsgBoxResult
+    Ansr = MsgBox("Are you sure you want to delete all values?", vbYesNo)
+    ActiveSheet.Unprotect Password:="0.0"
+    If Ansr = vbYes Then
+        If Range("FilesTbl[Old Name]").Count > 1 Then Range("FilesTbl").EntireRow.Delete
+    End If
+    Range("D11").Value = Range("D1").Value
+    ActiveSheet.Protect Password:="0.0"
+End Sub
