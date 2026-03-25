@@ -1,0 +1,28 @@
+Sub Browse()
+Dim FolderPath As String
+Dim xObject As Object
+Dim xFolder As Object
+Dim i As Long
+Dim k As Integer
+k = 0
+   ActiveSheet.Unprotect Password:="0.0"
+If Application.FileDialog(msoFileDialogFolderPicker).Show = 0 Then Exit Sub
+FolderPath = Application.FileDialog(msoFileDialogFolderPicker).SelectedItems(1)
+Range("B3").Value = FolderPath
+Set xObject = CreateObject("Scripting.FileSystemObject")
+Set xFolder = xObject.getFolder(FolderPath)
+i = 1
+If Range("FilesTbl[Old Name]").Count > 1 Then Range("filesTbl[Old Name]").EntireRow.Delete
+For Each iFiles In xFolder.Files
+    If InStrRev(iFiles.Name, ".") = 0 Then
+        Range("FilesTbl").Cells(i, 1).Value = iFiles.Name
+        Range("FilesTbl").Cells(i, 2).Value = ".pdf"
+    Else
+        Range("FilesTbl").Cells(i, 1).Value = Left(iFiles.Name, InStrRev(iFiles.Name, ".") - 1)
+        Range("FilesTbl").Cells(i, 2).Value = Mid(iFiles.Name, InStrRev(iFiles.Name, "."))
+    End If
+    i = i + 1
+Next
+   ActiveSheet.Protect Password:="0.0"
+   MsgBox i - 1 & " Finish"
+End Sub
