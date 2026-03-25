@@ -1,0 +1,77 @@
+
+Sub Rename_Files()
+Dim FolderPath As String
+Dim OldName As String
+Dim NewName As String
+   ActiveSheet.Unprotect Password:="0.0"
+FolderPath = Range("B3").Value
+If Application.WorksheetFunction.CountA(Range("FilesTbl[Old Name]")) = 0 Then
+MsgBox "No Files are selected"
+Exit Sub
+End If
+If Application.WorksheetFunction.CountA(Range("FilesTbl[New Name]")) = 0 Then
+    MsgBox "No Names are entered"
+    Exit Sub
+End If
+For Each cell In Range("FilesTbl[Old Name]")
+    On Error Resume Next
+    OldName = FolderPath & "\" & cell.Value & cell.Offset(0, 1).Value
+    NewName = FolderPath & "\" & cell.Offset(0, 2).Value & cell.Offset(0, 1).Value
+    Name OldName As NewName
+Next
+    ActiveSheet.Protect Password:="0.0"
+End Sub
+
+Sub Rename_Files_GPT()
+    Dim FolderPath As String
+    Dim OldName As String
+    Dim NewName As String
+    Dim FSO As Object ' File System Object for better file handling
+    Dim cell As Range
+
+    ' Unprotect the sheet
+    ActiveSheet.Unprotect Password:="0.0"
+
+    ' Get the folder path from the specified cell (B3)
+    FolderPath = Range("B3").Value
+
+    ' Check if there are any old names in the table
+    If Application.WorksheetFunction.CountA(Range("FilesTbl[Old Name]")) = 0 Then
+        MsgBox "No Files are selected"
+        Exit Sub
+    End If
+
+    ' Check if there are any new names entered
+    If Application.WorksheetFunction.CountA(Range("FilesTbl[New Name]")) = 0 Then
+        MsgBox "No Names are entered"
+        Exit Sub
+    End If
+
+    ' Create File System Object for better file handling
+    Set FSO = CreateObject("Scripting.FileSystemObject")
+
+    ' Loop through each file name in the "Old Name" column
+    For Each cell In Range("FilesTbl[Old Name]")
+        On Error Resume Next
+        
+        ' Concatenate old file name with folder path
+        OldName = FolderPath & "\" & cell.Value & cell.Offset(0, 1).Value
+        ' Concatenate new file name with folder path
+        NewName = FolderPath & "\" & cell.Offset(0, 2).Value & cell.Offset(0, 1).Value
+
+        ' Check if the old file exists before renaming
+        If FSO.FileExists(OldName) Then
+            ' Rename the file using File System Object to ensure compatibility with Unicode file names
+            FSO.MoveFile OldName, NewName
+        Else
+            ' If the file doesn't exist, inform the user
+            MsgBox "File not found: " & OldName, vbExclamation
+        End If
+    Next
+
+    ' Re-protect the sheet
+    ActiveSheet.Protect Password:="0.0"
+    
+    ' Cleanup
+    Set FSO = Nothing
+End Sub
